@@ -1,0 +1,4 @@
+sanic
+sanic_redis
+psycopg2
+aioredis
