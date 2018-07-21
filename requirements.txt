@@ -2,3 +2,7 @@ sanic
 sanic_redis
 psycopg2
 aioredis
+websockets==5.0.1 # TODO: remove this once sanic fixes compat
+aiopg
+pandas
+geopandas
