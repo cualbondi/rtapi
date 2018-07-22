@@ -1,4 +1,5 @@
-FROM python:3.6.6
+# TODO: upgrade to 3.7 once deps update
+FROM python:3.6
 
 ENV PYTHONUNBUFFERED 1
 
