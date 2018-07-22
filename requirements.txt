@@ -1,8 +1,7 @@
 sanic
 sanic_redis
-psycopg2
+psycopg2-binary
+# aiopg
 aioredis
 websockets==5.0.1 # TODO: remove this once sanic fixes compat
-aiopg
-pandas
 geopandas
