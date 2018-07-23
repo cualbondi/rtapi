@@ -12,12 +12,16 @@ import aioredis
 
 from cualbondi import get_recorridos, search, serialize_result
 
+# TODO: remove this after development is done
+from aoiklivereload import LiveReloader
+reloader = LiveReloader()
+reloader.start_watcher_thread()
+
 
 app = Sanic(__name__)
 
 df = get_recorridos()
 d = defaultdict(list)
-
 
 @app.route('/')
 async def test(request):
@@ -42,7 +46,7 @@ async def feed(request, ws):
 @app.listener('after_server_start')
 async def sub_redis(app, loop):
     sub = await aioredis.create_redis('redis://redis')
-    res = await sub.subscribe('update')
+    res = await sub.subscribe('gps-<id_recorrido>')
     ch1 = res[0]
 
     # read redis pubsub stream
@@ -57,6 +61,7 @@ async def sub_redis(app, loop):
 
 
 async def process_update(msg):
+    a = 1
     # fake update redis with:
     # publish update '{"id": 1, "position": "POINT (0 1)", "timestamp": "2018-07-01"}'
     mid = msg["id"]
@@ -80,4 +85,4 @@ async def process_update(msg):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, workers=1)
+    app.run(host='0.0.0.0', port=8000, workers=1, debug=True)
