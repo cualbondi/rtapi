@@ -23,6 +23,7 @@ app = Sanic(__name__)
 df = get_recorridos()
 d = defaultdict(list)
 
+
 @app.route('/')
 async def test(request):
     return json({'hello': 'world'})
@@ -61,7 +62,6 @@ async def sub_redis(app, loop):
 
 
 async def process_update(msg):
-    a = 1
     # fake update redis with:
     # publish update '{"id": 1, "position": "POINT (0 1)", "timestamp": "2018-07-01"}'
     mid = msg["id"]
