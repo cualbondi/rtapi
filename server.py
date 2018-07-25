@@ -66,7 +66,11 @@ async def process_update(msg):
     mid = msg["RecorridoID"]
     # bus_position = Point(0, 1)
     bus_position = wkt.loads(msg["Point"])
-    ruta = df.loc[mid].ruta
+    try:
+        ruta = df.loc[mid].ruta
+    except KeyError:
+        print('no matching route found for id ', mid)
+        return
     # ruta = LineString([(-2, 2), (4, 2), (4, 1.5), (-2, 1.5)])
     # get the listers for this recorrido_id
     listeners = d[mid]
