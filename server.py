@@ -62,15 +62,15 @@ async def sub_redis(app, loop):
 
 
 async def process_update(msg):
-    # fake update redis with:
-    # publish update '{"id": 1, "position": "POINT (0 1)", "timestamp": "2018-07-01"}'
-    mid = msg["id"]
+    # {'RecorridoID': 0, 'Timestamp': '2018-07-25 00:40:03', 'Point': 'POINT (-38.7431419999999989 -62.2601849999999999)', 'Angle': 0, 'Speed': 0, 'IDGps': 868683028315608}
+    mid = msg["RecorridoID"]
     # bus_position = Point(0, 1)
-    bus_position = wkt.loads(msg["position"])
-    # ruta = df[df.id == mid].ruta
-    ruta = LineString([(-2, 2), (4, 2), (4, 1.5), (-2, 1.5)])
+    bus_position = wkt.loads(msg["Point"])
+    ruta = df.loc[mid].ruta
+    # ruta = LineString([(-2, 2), (4, 2), (4, 1.5), (-2, 1.5)])
     # get the listers for this recorrido_id
     listeners = d[mid]
+    print('amount of listeners: ', len(listeners))
     for sub in listeners:
         # user_position = Point(1, 1)
         user_position = wkt.loads(sub["position"])
@@ -80,7 +80,7 @@ async def process_update(msg):
             continue
 
         ans = serialize_result(result)
-        ans['timestamp'] = msg["timestamp"]
+        ans['timestamp'] = msg["Timestamp"]
         await sub['ws'].send(dumps(ans))
 
 

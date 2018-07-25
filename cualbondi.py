@@ -28,6 +28,7 @@ def get_recorridos():
 
     df = gpd.read_postgis(query, conn, geom_col='ruta',
                           crs={'init': 'epsg:4326'})
+    df = df.set_index("id")
     return df
 
 
