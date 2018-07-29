@@ -57,7 +57,7 @@ async def sub_redis(app, loop):
         except json.decoder.JSONDecodeError as e:
             print(e)
             continue
-        print("from redis: ", msg)
+        # print("from redis: ", msg)
         await process_update(msg)
 
 
@@ -74,7 +74,7 @@ async def process_update(msg):
     # ruta = LineString([(-2, 2), (4, 2), (4, 1.5), (-2, 1.5)])
     # get the listers for this recorrido_id
     listeners = d[mid]
-    print('amount of listeners: ', len(listeners))
+    # print('amount of listeners: ', len(listeners))
     for sub in listeners:
         # user_position = Point(1, 1)
         user_position = wkt.loads(sub["position"])
