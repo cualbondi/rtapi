@@ -88,3 +88,6 @@ def serialize_result(result):
         "Bproj": result["Bproj"].to_wkt(),
         "len": result["len"]
     }
+
+
+recorridos = get_recorridos()
