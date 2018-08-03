@@ -30,12 +30,11 @@ class BaseFeed:
         if ws not in self.clients:
             self.clients[ws] = info
 
-    async def message_handler(self, msg):
-        for ws, info in self.clients.items():
-            try:
-                await self.notify_sub(msg, ws, info)
-            except ConnectionClosed:
-                self.remove_client(ws)
+    async def broadcast_message(self, msg):
+        await asyncio.gather(
+            *[self.notify_sub(msg, ws, info)
+              for ws, info in self.clients.items()]
+        )
 
     async def subscribe(self):
         res = await self.app.redis.subscribe(self.redis_channel)
@@ -49,17 +48,23 @@ class BaseFeed:
             except JSONDecodeError as e:
                 print(e)
                 continue
-            await self.message_handler(msg)
+            asyncio.ensure_future(self.broadcast_message(msg))
 
     def remove_client(self, client):
         self.clients.pop(client)
 
     async def notify_sub(self, msg, ws, info):
+        try:
+            await self.message_handler(msg, ws, info)
+        except ConnectionClosed:
+            self.remove_client(ws)
+
+    async def message_handler(self, msg, ws, info):
         pass
 
 
 class BondiFeed(BaseFeed):
-    async def notify_sub(self, msg, ws, position):
+    async def message_handler(self, msg, ws, position):
         # {'RecorridoID': 0, 'Timestamp': '2018-07-25 00:40:03',
         # 'Point': 'POINT (-38.7431419999999989 -62.2601849999999999)',
         # 'Angle': 0, 'Speed': 0, 'IDGps': 868683028315608}
