@@ -3,3 +3,4 @@ psycopg2-binary
 aioredis
 websockets==5.0.1 # TODO: remove this once sanic fixes compat
 geopandas
+aiopg

@@ -43,8 +43,7 @@ def get_geom_array(geom):
 def search(recorrido, A, B):
     # {"match": true, "subruta": <polyline>, "distance": 123}
 
-    # buffsize = 0.001  # alrededor de 100mts
-    buffsize = 1
+    buffsize = 0.001  # alrededor de 100mts
     Abuff = A.buffer(buffsize)
     Bbuff = B.buffer(buffsize)
     minlength = 100000

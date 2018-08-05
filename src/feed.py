@@ -24,13 +24,15 @@ class BaseFeed:
         self.app = app
         self.clients = {}
 
+        # queue subscribe into the event loop
         asyncio.ensure_future(self.subscribe())
 
     def add_listener(self, ws, info):
-        if ws not in self.clients:
-            self.clients[ws] = info
+        self.clients[ws] = info
+        print(self.id, self.clients)
 
     async def broadcast_message(self, msg):
+        # run in parallel
         await asyncio.gather(
             *[self.notify_sub(msg, ws, info)
               for ws, info in self.clients.items()]
@@ -48,6 +50,7 @@ class BaseFeed:
             except JSONDecodeError as e:
                 print(e)
                 continue
+            # queue broadcasting into the event loop and keep recieving
             asyncio.ensure_future(self.broadcast_message(msg))
 
     def remove_client(self, client):
@@ -68,20 +71,19 @@ class BondiFeed(BaseFeed):
         # {'RecorridoID': 0, 'Timestamp': '2018-07-25 00:40:03',
         # 'Point': 'POINT (-38.7431419999999989 -62.2601849999999999)',
         # 'Angle': 0, 'Speed': 0, 'IDGps': 868683028315608}
-        mid = msg["RecorridoID"]
+        recorrido_id = msg["RecorridoID"]
         bus_position = wkt.loads(msg["Point"])
         try:
-            ruta = recorridos.loc[mid].ruta
+            ruta = recorridos.loc[recorrido_id].ruta
         except KeyError:
-            print('no matching route found for id ', mid)
+            print('no matching route found for id ', recorrido_id)
             return
         user_position = wkt.loads(position)
-        print(bus_position)
-        print(user_position)
         result = search(ruta, bus_position, user_position)
         if result is None:
             print("no results found")
             return
-        ans = serialize_result(result)
-        ans['timestamp'] = msg["Timestamp"]
-        await ws.send(dumps(ans))
+        response = serialize_result(result)
+        response['timestamp'] = msg["Timestamp"]
+        response['id_gps'] = msg['IDGps']
+        await ws.send(dumps(response))
