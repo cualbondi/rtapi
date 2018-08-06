@@ -43,9 +43,10 @@ def get_geom_array(geom):
 def search(recorrido, A, B):
     # {"match": true, "subruta": <polyline>, "distance": 123}
 
-    buffsize = 0.001  # alrededor de 100mts
-    Abuff = A.buffer(buffsize)
-    Bbuff = B.buffer(buffsize)
+    buffsizeBondi = 0.001  # alrededor de 100mts
+    buffsizeCliente = 0.01  # alrededor de 1000mts
+    Abuff = A.buffer(buffsizeBondi)
+    Bbuff = B.buffer(buffsizeCliente)
     minlength = 100000
     A_intersections = get_geom_array(recorrido.intersection(Abuff))
     B_intersections = get_geom_array(recorrido.intersection(Bbuff))
