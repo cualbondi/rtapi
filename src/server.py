@@ -34,10 +34,11 @@ async def feed(request, ws):
             for recorrido in recorridos:
                 feed = get_feed(recorrido, app)
                 feed.add_listener(ws, position)
-                
+
             await send_initial_data(ws, recorridos, position)
         except ConnectionClosed:
             break
+
 
 async def send_initial_data(ws, recorridos, position):
     async with app.pgpool.acquire() as conn:
@@ -52,14 +53,12 @@ async def send_initial_data(ws, recorridos, position):
                 group by id_gps
                 )
                 and recorrido_id = %s
-                and extract(epoch from now() - timestamp) < 60*1500
+                and extract(epoch from now() - timestamp) < 60*15
                 """
                 await cur.execute(query, (recorrido, recorrido))
                 fields = ('id', 'timestamp', 'latlng', 'id_gps', 'speed', 'angle', 'recorrido_id', 'meta')
                 async for row in cur:
-                    print(row)
                     res = dict(zip(fields, row))
-                    print(res)
                     try:
                         recorrido_id = res['recorrido_id']
                         ruta = recorridos_df.loc[recorrido_id].ruta
@@ -75,9 +74,8 @@ async def send_initial_data(ws, recorridos, position):
                     response = serialize_result(result)
                     response['timestamp'] = res["timestamp"].isoformat()
                     response['id_gps'] = res['id_gps']
-                    print('sending result')
                     await ws.send(dumps(response))
-                
+
     # connect db
     # query para c/ recorrido
     # search
